@@ -1,7 +1,6 @@
 # Import necessary libraries
 import streamlit as st
 import pandas as pd
-import numpy as np
 import pyodbc
 
 
@@ -30,17 +29,26 @@ def load_data():
 
     # Preview the dataset from the MSSQL database
     query = "SELECT * FROM dbo.LP2_Telco_churn_first_3000"
-    df = pd.read_sql(query, conn)
+    df = pd.read_sql(query, conn).head(100)
 
     # Close connection
     conn.close()
-    return df.head(100)
-data = st.dataframe(load_data())
+    return df
 
+df = load_data().head(100)
 
-# Select columns based on their data type.
+# Display based on selection
+if option == 'Numeric Columns':
+    st.subheader('Numeric Data')
+    st.write(df.select_dtypes(include='number'))
 
+elif option == 'Categorical Columns':
+    st.subheader('Categorical Data')
+    st.write(df.select_dtypes(include='object'))
 
+else:
+    st.subheader('Entire Dataset')
+    st.write(df)
 
 
 

@@ -7,3 +7,6 @@ st.set_page_config(
     page_icon='📊',
     layout='wide'
 )
+
+# Set header for page
+st.header('Dashboard')
