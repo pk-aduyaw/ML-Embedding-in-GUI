@@ -8,5 +8,15 @@ st.set_page_config(
     layout='wide'
 )
 
+# --------- Add custom CSS to adjust the width of the sidebar
+
+st.markdown( """ <style> 
+            section[data-testid="stSidebar"]
+            { width: 200px !important;
+            }
+            </style> """,
+            unsafe_allow_html=True,
+)
+
 # Set header for page
-st.header('History')
+st.title('History')

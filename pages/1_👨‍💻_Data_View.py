@@ -11,13 +11,24 @@ st.set_page_config(
     layout='wide'
 )
 
+# --------- Add custom CSS to adjust the width of the sidebar
+
+st.markdown( """ <style> 
+            section[data-testid="stSidebar"]
+            { width: 200px !important;
+            }
+            </style> """,
+            unsafe_allow_html=True,
+)
+
 # Set header for dataset view
-st.header('Dataset View')
+st.title('Dataset View')
 
 # Create selection option
 column1, column2 = st.columns(2)
 with column2:
-        option = st.selectbox('Choose columns to be viewed', ('All Data','Numeric Data','Categorical Data'))
+        option = st.selectbox('Choose columns to be viewed',
+                              ('All Columns','Numeric Columns','Categorical Columns'))
 
 
 # Set Catch for data
@@ -40,16 +51,15 @@ def load_data():
 
     return df
 
-if __name__ == '__main__':
-    df = load_data()
+df = load_data()
 
 # Display based on selection
-if option == 'Numeric Data':
-    st.subheader('Numeric Data')
+if option == 'Numeric Columns':
+    st.subheader('Numeric Columns')
     st.write(df.select_dtypes(include='number'))
 
-elif option == 'Categorical Data':
-    st.subheader('Categorical Data')
+elif option == 'Categorical Columns':
+    st.subheader('Categorical Columns')
     st.write(df.select_dtypes(include='object'))
 
 else:
@@ -57,7 +67,7 @@ else:
     st.write(df)
 
 
-with st.expander('Expand to view data description'):
+with st.expander('**Expand to view data description**'):
     st.markdown('''
     :gray[**The following describes the columns present in the data.**]
 
@@ -102,26 +112,3 @@ with st.expander('Expand to view data description'):
 **Churn** -- Whether the customer churned or not (Yes or No)
 ''')
              
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
