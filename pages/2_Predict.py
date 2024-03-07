@@ -6,6 +6,7 @@ import requests
 from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
 import imblearn
+import os
 
 # Configure the page
 st.set_page_config(
@@ -14,8 +15,8 @@ st.set_page_config(
     layout='wide'
 )
 
-# --------- Add custom CSS to adjust the width of the sidebar
 
+# --------- Add custom CSS to adjust the width of the sidebar
 st.markdown( """ <style> 
             section[data-testid="stSidebar"]
             { width: 200px !important;
@@ -39,19 +40,21 @@ encoder_url = 'https://raw.githubusercontent.com/pk-aduyaw/Customer_Churn_Classi
 
 
 # -------- Function to load the model from GitHub
-@st.cache_resource(show_spinner=True, experimental_allow_widgets=True)
+@st.cache_resource(show_spinner="Loading model")
 def gb_pipeline():
     response = requests.get(github_model1_url)
     model_bytes = BytesIO(response.content)
     pipeline = joblib.load(model_bytes)
     return pipeline
 
-@st.cache_resource(show_spinner=False, experimental_allow_widgets=True)
+
+@st.cache_resource(show_spinner="Loading model")
 def sv_pipeline():
     response = requests.get(github_model2_url)
     model_bytes = BytesIO(response.content)
     pipeline = joblib.load(model_bytes)
     return pipeline
+
 
 # --------- Function to load encoder from GitHub
 def load_encoder():
@@ -60,16 +63,16 @@ def load_encoder():
     encoder = joblib.load(encoder_bytes)
     return encoder
 
+
 # --------- Create a function for model selection
 def select_model():
     # ------- Option for first model
     if model_option == 'Gradient Boosting':
         model = gb_pipeline()
-        encoder = load_encoder()
     # ------- Option for second model
     if model_option == 'Support Vector':
         model = sv_pipeline()
-        encoder = load_encoder()
+    encoder = load_encoder()
     return model, encoder
 
 
@@ -116,10 +119,16 @@ class columnDropper(BaseEstimator, TransformerMixin):
         # Return feature names after dropping the specified column
         return [feature for feature in input_features if feature != 'customerID']
 
+# ---- Initialize prediction in session state
+if 'prediction' not in st.session_state:
+    st.session_state['prediction'] = None
+if 'prediction_proba' not in st.session_state:
+    st.session_state['prediction_proba'] = None
 
 # ------- Create a function to make prediction
 def make_prediction(model, encoder):
-    df = st.session_state['df']
+    df = pd.DataFrame(st.session_state['df'])
+    
     # -------- Get the value for predicted
     prediction = model.predict(df)
     prediction = encoder.inverse_transform(prediction)
@@ -129,26 +138,32 @@ def make_prediction(model, encoder):
     prediction_proba = model.predict_proba(df)
     st.session_state['prediction_proba'] = prediction_proba
 
+    df['Churn'] = prediction
+    df['Model'] = model_option
+
+    df.to_csv('./data/history.csv', mode='a', header=not os.path.exists('./data/history.csv'), index=False)
+
     return prediction, prediction_proba
+
 
 # ------- Prediction page creation
 def input_features():
 
-    with st.form('features'):
+    with st.form('features', clear_on_submit=True):
+        model_pipeline, encoder = select_model()
+        col1, col2 = st.columns(2)
 
-        model, encoder = select_model()
-        col1, col2, col3 = st.columns(3)
         # ------ Collect customer information
         with col1:
             st.subheader('Demographics')
-            customer_id = st.text_input('Customer ID', placeholder='eg. 1234-ABCD', key='customer_id')
+            customer_id = st.text_input('Customer ID', placeholder='eg. 1234-ABCDE', key='customer_id')
             gender = st.radio('Gender', options=['Male', 'Female'],horizontal=True, key='gender')
             partners = st.radio('Partners', options=['Yes', 'No'],horizontal=True, key='partners')
             dependents = st.radio('Dependents', options=['Yes', 'No'],horizontal=True, key='dependents')
             senior_citizen = st.radio("Senior Citizen ('Yes-1, No-0')", options=[1, 0],horizontal=True, key='senior_citizen')
         
         # ------ Collect customer account information
-        with col2:
+        with col1:
             st.subheader('Customer Account Info.')
             tenure = st.number_input('Tenure', min_value=0, max_value=70, key='tenure')
             contract = st.selectbox('Contract', options=['Month-to-month', 'One year', 'Two year'], key='contract')
@@ -159,10 +174,9 @@ def input_features():
             monthly_charges = st.number_input('Monthly Charges', placeholder='Enter amount...', key='monthly_charges')
             total_charges = st.number_input('Total Charges', placeholder='Enter amount...', key='total_charges')
             
-
         # ------ Collect customer subscription information
-        with col3:
-            st.subheader('Subscription')
+        with col2:
+            st.subheader('Subscriptions')
             phone_service = st.radio('Phone Service', ['Yes', 'No'], horizontal=True, key='phone_service')
             multiple_lines = st.selectbox('Multiple Lines', ['Yes', 'No', 'No internet servie'], key='multiple_lines')
             internet_service = st.selectbox('Internet Service', ['DSL','Fiber optic', 'No'], key='internet_service')
@@ -172,8 +186,6 @@ def input_features():
             tech_support = st.selectbox('Tech Support', ['Yes', 'No', 'No internet servie'], key='tech_support')
             streaming_tv = st.selectbox('Streaming TV', ['Yes', 'No', 'No internet servie'], key='streaming_tv')
             streaming_movies = st.selectbox('Streaming Movies', ['Yes', 'No', 'No internet servie'], key='streaming_movies')
-
-
 
         # Create a DataFrame with the input features
         input_data = pd.DataFrame({
@@ -199,17 +211,35 @@ def input_features():
                 'TotalCharges': [total_charges]
             })
         st.session_state['df'] = input_data
-        st.form_submit_button('Submit', on_click=make_prediction, kwargs=dict(model=model, encoder=encoder))
+        st.form_submit_button('Predict', on_click=make_prediction, kwargs=dict(model=model_pipeline, encoder=encoder))
     return input_data
 
 if __name__ == '__main__':
-    columnDropper()
-    TotalCharges_cleaner()
     input_features()
 
-if 'prediction' not in st.session_state:
-    st.session_state['prediction'] = None
+    prediction = st.session_state['prediction']
+    probability = st.session_state['prediction_proba']    
 
-else:
-    value = st.session_state['prediction']
-    st.write(value)
+    if st.session_state['prediction'] == None:
+        col1, col2, col3 = st.columns(3)
+        with col2:
+            st.markdown('#### Predictions show here ⤵️')
+        col1, col2, col3 = st.columns([.25,.5,.25])
+        with col2:
+            st.markdown('##### No predictions made yet. Make prediction')
+    else:
+        if prediction == "Yes":
+            col1, col2, col3 = st.columns([.1,.8,.1])
+            with col2:
+                st.markdown(f'### The customer will churn with a {round(probability[0][1],2)}% probability.')
+            col1, col2, col3 = st.columns([.3,.4,.3])
+            with col2:
+                st.success('Churn status predicted successfullly🎉')
+        else:
+            col1, col2, col3 = st.columns([.1,.8,.1])
+            with col2:
+                st.markdown(f'### The customer will not churn with a {round(probability[0][0],2)}% probability.')
+            col1, col2, col3 = st.columns([.3,.4,.3])
+            with col2:
+                st.success('Churn status predicted successfullly🎉')
+

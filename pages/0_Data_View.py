@@ -11,8 +11,8 @@ st.set_page_config(
     layout='wide'
 )
 
-# --------- Add custom CSS to adjust the width of the sidebar
 
+# --------- Add custom CSS to adjust the width of the sidebar
 st.markdown( """ <style> 
             section[data-testid="stSidebar"]
             { width: 200px !important;
@@ -32,10 +32,9 @@ with column2:
 
 
 # Set Catch for data
-@st.cache_data(experimental_allow_widgets=True)
-def load_data():
-
-    
+@st.cache_data(show_spinner='Loading Data')
+def remote_data():
+   
     # Connect to database in SQL
     db_config = st.secrets['mssql']
 
@@ -51,7 +50,7 @@ def load_data():
 
     return df
 
-df = load_data()
+df = remote_data()
 
 # Display based on selection
 if option == 'Numeric Columns':
@@ -63,11 +62,12 @@ elif option == 'Categorical Columns':
     st.write(df.select_dtypes(include='object'))
 
 else:
-    st.subheader('Entire Dataset')
+    st.subheader('Complete Dataset')
     st.write(df)
 
 
-with st.expander('**Expand to view data description**'):
+# ----- Add column descriptions of the dataset
+with st.expander('**Click to view column description**'):
     st.markdown('''
     :gray[**The following describes the columns present in the data.**]
 

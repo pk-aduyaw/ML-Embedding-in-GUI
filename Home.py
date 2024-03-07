@@ -13,7 +13,6 @@ st.set_page_config(
 )
 
 # --------- Add custom CSS to adjust the width of the sidebar
-
 st.markdown( """ <style> 
             section[data-testid="stSidebar"]
             { width: 200px !important;
@@ -22,5 +21,12 @@ st.markdown( """ <style>
             unsafe_allow_html=True,
 )
 
-# Set page title
-st.title('Customer Churn Prediction App')
+
+def main():
+    # Set page title
+    st.title('Customer Churn Prediction App')
+
+
+
+if __name__=='__main__':
+    main()
