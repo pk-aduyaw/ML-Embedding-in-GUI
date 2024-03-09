@@ -229,9 +229,9 @@ if __name__ == '__main__':
     probability = st.session_state['prediction_proba']    
 
     if st.session_state['prediction'] == None:
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns([3, 4, 3])
         with col2:
-            st.markdown('#### Predictions show here ⤵️')
+            st.markdown('#### Predictions will show here ⤵️')
         col1, col2, col3 = st.columns([.25,.5,.25])
         with col2:
             st.markdown('##### No predictions made yet. Make prediction')

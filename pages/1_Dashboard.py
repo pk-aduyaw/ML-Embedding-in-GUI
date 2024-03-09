@@ -58,8 +58,9 @@ def eda_viz():
 
 def kpi_viz():
     st.subheader('Analytical Questions')
+    st.markdown('---')
     col1, col2, col3, col4, col5 = st.columns(5)
-
+    st.markdown('---')
     # ------- Grand Total Charges
     with col1:
         grand_tc = df['TotalCharges'].sum()
@@ -74,7 +75,7 @@ def kpi_viz():
 
     # ------- Average Customer Tenure
     with col3:
-        average_tenure = df['tenure'].sum()
+        average_tenure = df['tenure'].mean()
         st.markdown('###### Average Tenure')
         st.markdown(f'#### {"{:,.2f}".format(average_tenure)}')
 
