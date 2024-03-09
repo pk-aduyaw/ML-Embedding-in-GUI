@@ -80,7 +80,7 @@ def kpi_viz():
 
     # ------- Churned Customers
     with col4:
-        churned = len(df.loc[df['Churn']==1])
+        churned = len(df.loc[df['Churn'] == 1])
         st.markdown('###### Churn')
         st.markdown(f'#### {churned}')
 
@@ -91,6 +91,65 @@ def kpi_viz():
         st.markdown(f'#### {total_customers}')
 
         
+def analytical_ques_viz():
+    # ------ Answer Analytical Question 1
+    mal_churned_customers = df[(df['gender']=='Male') & (df['Dependents']== 1) & (df['Churn']== 1)]['PaymentMethod'].value_counts()
+
+    values = mal_churned_customers.values
+    labels = mal_churned_customers.index
+
+    treemap_df = pd.DataFrame({'labels': labels, 'values': values})
+
+    fig = px.treemap(treemap_df, path=['labels'], values='values', color='values',
+                  color_continuous_scale='Blues', title='Q1. How many male customers with dependents churned given their payment method?')
+    st.plotly_chart(fig)
+    
+    
+    # ------ Answer Analytical Question 2
+    fem_churned_customers = df[(df['gender']=='Female') & (df['Dependents']== 1) & (df['Churn']== 1)]['PaymentMethod'].value_counts()
+
+    values = fem_churned_customers.values
+    labels = fem_churned_customers.index
+
+    treemap_df = pd.DataFrame({'labels': labels, 'values': values})
+
+    fig = px.treemap(treemap_df, path=['labels'], values='values', color='values',
+                  color_continuous_scale='Blues', title='Q2. How many female customers with dependents churned given their payment method?')
+    st.plotly_chart(fig)
+
+
+    
+    # ------ Answer Analytical Question 3
+    churned = df[df['Churn'] == 1]
+
+    fig = px.bar(churned, x='MultipleLines', color='gender', barmode='group',
+             title='Q3. What is the distribution for the customers who churned given their multiple lines status?',
+             labels={'MultipleLines': 'Multiple Lines', 'gender': 'Gender'})
+
+    st.plotly_chart(fig)
+    
+
+    # ------ Answer Analytical Question 4
+    monthly_charges = df.groupby('gender')['MonthlyCharges'].sum().reset_index()
+
+    fig = px.pie(monthly_charges, names='gender', values='MonthlyCharges',
+             title='Q4. What percentage of MonthlyCharges was accumulated given the customer gender?',
+             color='gender',
+             labels={'gender': 'Gender', 'MonthlyCharges': 'Monthly Charges'})
+
+    # Show the figure in Streamlit
+    st.plotly_chart(fig)
+    
+
+    # ------ Answer Analytical Question 5
+    monthly_charges = df.groupby('Churn')['TotalCharges'].sum().reset_index()
+
+    fig = px.pie(monthly_charges, names='Churn', values='TotalCharges',
+             title='Q5. What percentage of TotalCharges was accumulated given customer churn status?',
+             color='Churn',
+             labels={'Churn': 'Churn', 'TotalCharges': 'Monthly Charges'})
+
+    st.plotly_chart(fig)
 
 
 
@@ -99,3 +158,6 @@ if __name__ == '__main__':
         eda_viz()
     elif options == 'Analytical Questions':
         kpi_viz()
+        analytical_ques_viz()
+    else:
+        st.markdown('#### No viz display selected yet')
