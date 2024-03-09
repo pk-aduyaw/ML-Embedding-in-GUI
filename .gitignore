@@ -1,3 +1,6 @@
-venv
-.streamlit
-config.yaml
+/venv
+/.streamlit
+/config.yaml
+./pages/__pycache__
+/__pycache__
+remote_data.py

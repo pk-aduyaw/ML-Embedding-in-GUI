@@ -1,8 +1,6 @@
 # Import necessary libraries
 import streamlit as st
 import pandas as pd
-import pyodbc
-
 
 # Configure the page
 st.set_page_config(
@@ -30,27 +28,13 @@ with column2:
         option = st.selectbox('Choose columns to be viewed',
                               ('All Columns','Numeric Columns','Categorical Columns'))
 
-
-# Set Catch for data
-@st.cache_data(show_spinner='Loading Data')
-def remote_data():
-   
-    # Connect to database in SQL
-    db_config = st.secrets['mssql']
-
-    connection_string = (f"DRIVER={{{db_config['Driver']}}};SERVER={db_config['Server']};DATABASE={db_config['Database']};UID={db_config['Username']};PWD={db_config['Password']}")
-
-    conn = pyodbc.connect(connection_string)
-
-    # Preview the dataset from the MSSQL database
-    query = "SELECT * FROM dbo.LP2_Telco_churn_first_3000"
-    df = pd.read_sql(query, conn).head(100)
-    
-    conn.close()
-
+# ---- Load remote dataset
+@st.cache_data(show_spinner='Loading data')
+def load_data():
+    df = pd.read_csv('./data/dataset.csv')
     return df
 
-df = remote_data()
+df = load_data().head(100)
 
 # Display based on selection
 if option == 'Numeric Columns':
