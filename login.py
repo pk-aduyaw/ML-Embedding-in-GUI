@@ -14,12 +14,9 @@ def login_user():
         )
     col1, col2, col3 = st.columns([.3,.4,.3])
     with col2:
-        st.code('''
-            username: princekwabena
-            password: pushhard
-            ''', language='python')
+        
         authenticator.login()
-
+        
         if st.session_state["authentication_status"] == True:
             with st.sidebar:
                 authenticator.logout()
