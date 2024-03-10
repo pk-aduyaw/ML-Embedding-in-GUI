@@ -1,0 +1,10 @@
+credentials:
+  usernames:
+    princekwabena:
+      email: princeekow4@gmail.com
+      name: Prince Kwabena
+      password: pushhard
+cookie:
+  expiry_days: 30
+  key: some_signature_key # Must be string
+  name: some_cookie_name
