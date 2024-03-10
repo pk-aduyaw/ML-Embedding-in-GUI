@@ -1,3 +1,4 @@
 customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MultipleLines,InternetService,OnlineSecurity,OnlineBackup,DeviceProtection,TechSupport,StreamingTV,StreamingMovies,Contract,PaperlessBilling,PaymentMethod,MonthlyCharges,TotalCharges,Churn,Model
 1234-ABCDE,Female,0,Yes,No,22,Yes,No,DSL,No,Yes,Yes,Yes,No,No,Month-to-month,Yes,Mailed check,230.0,8070.0,No,Support Vector
 1234-ABCDE,Female,0,Yes,No,22,Yes,No,DSL,No,Yes,Yes,Yes,No,No,Month-to-month,Yes,Mailed check,230.0,8070.0,No,Gradient Boosting
+1556-ATFVH,Male,0,No,No,50,Yes,Yes,Fiber optic,Yes,Yes,Yes,Yes,No,No,Month-to-month,No,Electronic check,550.0,7000.0,No,Gradient Boosting

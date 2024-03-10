@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from login import login_user
 
 
 # Configure the page
@@ -19,9 +20,15 @@ st.markdown( """ <style>
             unsafe_allow_html=True,
 )
 
+def history_page():
 
-# Set header for page
-st.title('History')
+    login_user()
+    if st.session_state["authentication_status"] == True:
+        # Set header for page
+        st.title('History')
 
-data = pd.read_csv('./data/history.csv')
-st.dataframe(data)
+        data = pd.read_csv('./data/history.csv')
+        st.dataframe(data)
+
+if __name__ == '__main__':
+    history_page()

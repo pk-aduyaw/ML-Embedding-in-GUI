@@ -1,9 +1,6 @@
 # Import necassary libraries
 import streamlit as st
-from streamlit_option_menu import option_menu
-import login
-
-
+from login import login_user
 
 
 # Configure the page
@@ -25,13 +22,15 @@ st.markdown( """ <style>
 
 
 
-def main():
 
-    login.login_user()
-    
-    if st.sidebar == 'Home':
-        # After successful login, render other pages
-        st.title('Customer Churn Prediction App')
+def main():
+    login_user()
+
+    if st.session_state["authentication_status"] == True:
+
+        st.write(f'Welcome *{st.session_state["name"]}*')
+        st.header('Customer Churn Prediction App.')
+
 
 
 
