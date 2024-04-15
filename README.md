@@ -129,6 +129,10 @@ Login with these credentials
     password: pushhard
 ```
 
+Alternatively, the web app has been hosted on Render for easy access:
+
+Click to launch the web app [Streamlit App](https://ml-embedding-in-gui.onrender.com/)
+
 ## 👥 Author <a name="author"></a>
 
 ### Prince Kwabena
